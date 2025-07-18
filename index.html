@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+  <title>CmeptoCnos</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Баланс яблок и кнопка "+" -->
+    <div class="balance-section">
+      <p>Баланс: <span id="balance">0</span> яблок</p>
+      <button id="add-apples">+</button>
+    </div>
+
+    <!-- Окно покупки яблок -->
+    <div id="buy-modal" class="modal hidden">
+      <div class="modal-content">
+        <p>Курс - 1 яблоко = 3.15$</p>
+        <input type="number" id="apple-input" placeholder="Количество яблок" />
+        <p id="total-price">Общая стоимость: $0.00</p>
+        <button id="buy-apples">Купить яблоки</button>
+      </div>
+    </div>
+
+    <!-- Основной контент -->
+    <div class="main-content">
+      <h1>CmeptoCnos</h1>
+      <input type="text" id="username-input" placeholder="@username" />
+      
+      <!-- Кнопка "Инструкция" -->
+      <button id="instruction-button">Инструкция</button>
+
+      <!-- Модальное окно инструкции -->
+      <div id="instruction-modal" class="modal hidden">
+        <div class="modal-content">
+          <p>Снесем любого! Ставь нейм.</p>
+          <button id="close-instruction">Закрыть</button>
+        </div>
+      </div>
+
+      <button id="send-button">Снести (3.5🍎)</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
