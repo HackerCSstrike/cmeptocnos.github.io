@@ -1,65 +1,60 @@
-// Получаем элементы DOM
-const balanceElement = document.getElementById('balance');
-const addApplesButton = document.getElementById('add-apples');
-const buyModal = document.getElementById('buy-modal');
-const appleInput = document.getElementById('apple-input');
-const totalPrice = document.getElementById('total-price');
-const buyApplesButton = document.getElementById('buy-apples');
-const instructionButton = document.getElementById('instruction-button');
-const instructionModal = document.getElementById('instruction-modal');
-const closeInstructionButton = document.getElementById('close-instruction');
+const tg = window.Telegram.WebApp;
+tg.expand();
 
-// Переменная для хранения баланса
-let balance = 0;
+let balance = 1000;
+const cube = document.getElementById('cube');
 
-// Функция увеличения баланса
-function increaseBalance() {
-  balance += 1;
-  balanceElement.textContent = balance;
+const faceAngles = {
+    1: 'translateZ(-40px) rotateY(0deg)',
+    2: 'translateZ(-40px) rotateY(-90deg)',
+    3: 'translateZ(-40px) rotateY(-180deg)',
+    4: 'translateZ(-40px) rotateY(90deg)',
+    5: 'translateZ(-40px) rotateX(-90deg)',
+    6: 'translateZ(-40px) rotateX(90deg)'
+};
+
+function playGame() {
+    const bet = parseInt(document.getElementById('bet-amount').value);
+    const pick = document.getElementById('bet-outcome').value;
+
+    if (isNaN(bet) || bet <= 0 || bet > balance) {
+        tg.HapticFeedback.notificationOccurred('error');
+        return alert("Недостаточно средств!");
+    }
+
+    tg.HapticFeedback.impactOccurred('medium');
+    cube.classList.add('spinning');
+
+    setTimeout(() => {
+        cube.classList.remove('spinning');
+        const res = Math.floor(Math.random() * 6) + 1;
+        cube.style.transform = faceAngles[res];
+
+        let win = false;
+        if (pick === 'even' && res % 2 === 0) win = true;
+        else if (pick === 'odd' && res % 2 !== 0) win = true;
+        else if (pick === 'more' && res > 3) win = true;
+        else if (pick === 'less' && res <= 3) win = true;
+        else if (parseInt(pick) === res) win = true;
+
+        setTimeout(() => {
+            if (win) {
+                balance += bet;
+                tg.HapticFeedback.notificationOccurred('success');
+            } else {
+                balance -= bet;
+                tg.HapticFeedback.notificationOccurred('warning');
+            }
+            document.getElementById('balance').innerText = `$${balance.toLocaleString()}`;
+        }, 400);
+    }, 600);
 }
 
-// Показать окно покупки яблок
-addApplesButton.addEventListener('click', () => {
-  buyModal.classList.remove('hidden');
-  buyModal.classList.add('visible');
-});
+// Пополнение через Crypto Pay (базовая реализация)
+function openCryptoBot() {
+    tg.HapticFeedback.impactOccurred('light');
+    // Ссылка на оплату должна генерироваться твоим сервером через Crypto Pay API
+    tg.openTelegramLink('https://t.me/CryptoBot?start=pay'); 
+}
 
-// Закрыть окно покупки яблок
-document.addEventListener('click', (event) => {
-  if (!buyModal.contains(event.target) && !addApplesButton.contains(event.target)) {
-    buyModal.classList.add('hidden');
-    buyModal.classList.remove('visible');
-  }
-});
-
-// Расчет стоимости яблок
-appleInput.addEventListener('input', () => {
-  const apples = parseFloat(appleInput.value) || 0;
-  const price = apples * 3.15;
-  totalPrice.textContent = `Общая стоимость: $${price.toFixed(2)}`;
-});
-
-// Купить яблоки (перенаправление на ссылку)
-buyApplesButton.addEventListener('click', () => {
-  window.location.href = 'https://t.me/anon_spire ';
-});
-
-// Показать модальное окно инструкции
-instructionButton.addEventListener('click', () => {
-  instructionModal.classList.remove('hidden');
-  instructionModal.classList.add('visible');
-});
-
-// Закрыть модальное окно инструкции
-closeInstructionButton.addEventListener('click', () => {
-  instructionModal.classList.add('hidden');
-  instructionModal.classList.remove('visible');
-});
-
-// Закрыть модальное окно при клике вне его области
-document.addEventListener('click', (event) => {
-  if (!instructionModal.contains(event.target) && !instructionButton.contains(event.target)) {
-    instructionModal.classList.add('hidden');
-    instructionModal.classList.remove('visible');
-  }
-});
+function toggleModal(s) { document.getElementById('modal').style.display = s ? 'flex' : 'none'; }
