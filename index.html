@@ -1,49 +1,83 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
-  <title>CmeptoCnos</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WebXStudio Glass Casino</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-  <div class="container">
-    <!-- Баланс яблок и кнопка "+" -->
-    <div class="balance-section">
-      <p>Баланс: <span id="balance">0</span> яблок</p>
-      <button id="add-apples">+</button>
+    <div class="bg-animate">
+        <div class="circle c1"></div>
+        <div class="circle c2"></div>
     </div>
 
-    <!-- Окно покупки яблок -->
-    <div id="buy-modal" class="modal hidden">
-      <div class="modal-content">
-        <p>Курс - 1 яблоко = 3.15$</p>
-        <input type="number" id="apple-input" placeholder="Количество яблок" />
-        <p id="total-price">Общая стоимость: $0.00</p>
-        <button id="buy-apples">Купить яблоки</button>
-      </div>
-    </div>
+    <div class="container">
+        <div class="glass-card">
+            <div class="header">
+                <p class="label">Ваш Баланс</p>
+                <div class="balance-wrapper">
+                    <h1 id="balance">$1,000</h1>
+                    <button class="add-btn" onclick="createInvoice()">+</button>
+                </div>
+            </div>
 
-    <!-- Основной контент -->
-    <div class="main-content">
-      <h1>CmeptoCnos</h1>
-      <input type="text" id="username-input" placeholder="@username" />
-      
-      <!-- Кнопка "Инструкция" -->
-      <button id="instruction-button">Инструкция</button>
+            <div class="game-box">
+                <div class="scene">
+                    <div class="cube" id="cube">
+                        <div class="face f1"><span class="pip"></span></div>
+                        <div class="face f2"><span class="pip"></span><span class="pip"></span></div>
+                        <div class="face f3"><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
+                        <div class="face f4">
+                            <div class="column"><span class="pip"></span><span class="pip"></span></div>
+                            <div class="column"><span class="pip"></span><span class="pip"></span></div>
+                        </div>
+                        <div class="face f5">
+                            <div class="column"><span class="pip"></span><span class="pip"></span></div>
+                            <div class="column center"><span class="pip"></span></div>
+                            <div class="column"><span class="pip"></span><span class="pip"></span></div>
+                        </div>
+                        <div class="face f6">
+                            <div class="column"><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
+                            <div class="column"><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-      <!-- Модальное окно инструкции -->
-      <div id="instruction-modal" class="modal hidden">
-        <div class="modal-content">
-          <p>Снесем любого! Ставь нейм.</p>
-          <button id="close-instruction">Закрыть</button>
+            <div class="ui-group">
+                <input type="number" id="bet-amount" placeholder="Сумма" value="100">
+                <select id="bet-outcome">
+                    <option value="even">Четное</option>
+                    <option value="odd">Нечетное</option>
+                    <option value="more">Больше (4-6)</option>
+                    <option value="less">Меньше (1-3)</option>
+                    <option value="1">Число: 1</option>
+                    <option value="2">Число: 2</option>
+                    <option value="3">Число: 3</option>
+                    <option value="4">Число: 4</option>
+                    <option value="5">Число: 5</option>
+                    <option value="6">Число: 6</option>
+                </select>
+            </div>
+
+            <button class="tg-btn" id="play-btn" onclick="playGame()">ПОСТАВИТЬ</button>
+            <button class="rules-link" onclick="toggleModal(true)">Правила игры</button>
         </div>
-      </div>
-
-      <button id="send-button">Снести (3.5🍎)</button>
+        <div class="branding">webxstudio production</div>
     </div>
-  </div>
 
-  <script src="script.js"></script>
+    <div id="modal" class="modal-overlay">
+        <div class="modal-glass">
+            <h3>⚙️ Правила</h3>
+            <div class="rules-content">
+                <p><b>1.</b> Только развлечение.<br><b>2.</b> Результаты RNG окончательны.<br><b>3.</b> Вывод от 1 рубля.<br><b>4.</b> Фрод запрещен.</p>
+            </div>
+            <button class="tg-btn secondary" onclick="toggleModal(false)">ПОНЯТНО</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
