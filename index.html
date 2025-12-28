@@ -4,69 +4,163 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>WebXStudio Casino</title>
-    <link rel="stylesheet" href="./style.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        /* ВШИТЫЕ СТИЛИ (CSS) */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: #0a0a0c; color: white;
+            font-family: sans-serif; height: 100vh;
+            display: flex; justify-content: center; align-items: center; overflow: hidden;
+        }
+        .bg-gradient {
+            position: absolute; inset: 0; z-index: -1;
+            background: radial-gradient(circle at 50% 50%, #2e1065 0%, #050505 100%);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 28px; padding: 30px; width: 320px; text-align: center;
+        }
+        .money-row { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 25px; }
+        h1 { font-size: 42px; font-weight: 800; }
+        .add-funds { background: #a855f7; border: none; border-radius: 10px; color: white; width: 34px; height: 34px; cursor: pointer; font-size: 20px; }
+        
+        /* КУБИК - 80% прозрачности, без белого фона */
+        .scene { width: 80px; height: 80px; perspective: 400px; margin: 20px auto 40px; }
+        .cube {
+            width: 100%; height: 100%; position: relative;
+            transform-style: preserve-3d; transform: translateZ(-40px);
+            transition: transform 0.6s cubic-bezier(0.15, 0.85, 0.35, 1.2);
+        }
+        .face {
+            position: absolute; width: 80px; height: 80px;
+            background: rgba(88, 28, 135, 0.8); /* Фиолетовое стекло 80% */
+            border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 15px;
+            display: flex; justify-content: space-around; align-items: center; padding: 10px;
+        }
+        .pip { width: 14px; height: 14px; background: white; border-radius: 50%; box-shadow: 0 0 8px #fff; }
+        .col { display: flex; flex-direction: column; justify-content: space-between; height: 100%; }
+        
+        /* ГРАНИ С ТОЧКАМИ */
+        .f1 { justify-content: center; transform: rotateY(0deg) translateZ(40px); }
+        .f2 { justify-content: space-between; transform: rotateY(90deg) translateZ(40px); }
+        .f2 .pip:nth-child(2) { align-self: flex-end; }
+        .f3 { justify-content: space-between; transform: rotateY(180deg) translateZ(40px); }
+        .f3 .pip:nth-child(2) { align-self: center; }
+        .f3 .pip:nth-child(3) { align-self: flex-end; }
+        .f4 { transform: rotateY(-90deg) translateZ(40px); }
+        .f5 { transform: rotateX(90deg) translateZ(40px); }
+        .f6 { transform: rotateX(-90deg) translateZ(40px); }
+
+        .spinning { animation: fastSpin 0.2s infinite linear; }
+        @keyframes fastSpin {
+            from { transform: translateZ(-40px) rotateX(0) rotateY(0); }
+            to { transform: translateZ(-40px) rotateX(360deg) rotateY(360deg); }
+        }
+
+        /* ИНТЕРФЕЙС */
+        .inputs { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+        input, select {
+            background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(168, 85, 247, 0.4);
+            padding: 14px; border-radius: 14px; color: white; font-size: 16px; outline: none;
+        }
+        .main-btn {
+            width: 100%; padding: 16px; border: none; border-radius: 16px;
+            background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);
+            color: white; font-weight: bold; font-size: 16px; cursor: pointer;
+        }
+        .footer-copy { margin-top: 25px; font-size: 10px; color: rgba(255,255,255,0.2); letter-spacing: 2px; }
+    </style>
 </head>
 <body>
     <div class="bg-gradient"></div>
     <div class="container">
         <div class="glass-card">
             <div class="header">
-                <p class="label">Ваш Баланс</p>
+                <p style="opacity: 0.5; font-size: 12px;">Ваш Баланс</p>
                 <div class="money-row">
                     <h1 id="balance">$1,000</h1>
                     <button class="add-funds" onclick="openCryptoBot()">+</button>
                 </div>
             </div>
 
-            <div class="game-space">
-                <div class="scene">
-                    <div class="cube" id="cube">
-                        <div class="face f1"><span class="pip"></span></div>
-                        <div class="face f2"><span class="pip"></span><span class="pip"></span></div>
-                        <div class="face f3"><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
-                        <div class="face f4">
-                            <div class="col"><span class="pip"></span><span class="pip"></span></div>
-                            <div class="col"><span class="pip"></span><span class="pip"></span></div>
-                        </div>
-                        <div class="face f5">
-                            <div class="col"><span class="pip"></span><span class="pip"></span></div>
-                            <div class="col c-mid"><span class="pip"></span></div>
-                            <div class="col"><span class="pip"></span><span class="pip"></span></div>
-                        </div>
-                        <div class="face f6">
-                            <div class="col"><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
-                            <div class="col"><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
-                        </div>
+            <div class="scene">
+                <div class="cube" id="cube">
+                    <div class="face f1"><span class="pip"></span></div>
+                    <div class="face f2"><span class="pip"></span><span class="pip"></span></div>
+                    <div class="face f3"><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
+                    <div class="face f4">
+                        <div class="col"><span class="pip"></span><span class="pip"></span></div>
+                        <div class="col"><span class="pip"></span><span class="pip"></span></div>
+                    </div>
+                    <div class="face f5">
+                        <div class="col"><span class="pip"></span><span class="pip"></span></div>
+                        <div class="col" style="justify-content:center"><span class="pip"></span></div>
+                        <div class="col"><span class="pip"></span><span class="pip"></span></div>
+                    </div>
+                    <div class="face f6">
+                        <div class="col"><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
+                        <div class="col"><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
                     </div>
                 </div>
             </div>
 
             <div class="inputs">
-                <input type="number" id="bet-amount" placeholder="Сумма" value="100">
+                <input type="number" id="bet-amount" value="100">
                 <select id="bet-outcome">
                     <option value="even">Четное</option>
                     <option value="odd">Нечетное</option>
-                    <option value="more">Больше (4-6)</option>
-                    <option value="less">Меньше (1-3)</option>
                 </select>
             </div>
-
             <button class="main-btn" onclick="playGame()">ПОСТАВИТЬ</button>
-            <button class="rules-btn" onclick="toggleModal(true)">Правила игры</button>
         </div>
-        <div class="footer-copy">webxstudio production</div>
+        <div class="footer-copy">WEBXSTUDIO PRODUCTION</div>
     </div>
 
-    <div id="modal" class="modal-overlay">
-        <div class="modal-card">
-            <h3>⚙️ Правила</h3>
-            <div class="modal-content">
-                <p>1. Общие положения: только развлечение.<br>2. Результаты RNG окончательны.<br>3. Вывод от 1 рубля.<br>4. Фрод запрещен.</p>
-            </div>
-            <button class="main-btn" onclick="toggleModal(false)">ПОНЯТНО</button>
-        </div>
-    </div>
-    <script src="./script.js"></script>
+    <script>
+        /* ЛОГИКА (JS) */
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        
+        const userId = tg.initDataUnsafe?.user?.id || "local";
+        let balance = parseInt(localStorage.getItem(`bal_${userId}`)) || 1000;
+
+        function updateUI() {
+            document.getElementById('balance').innerText = `$${balance.toLocaleString()}`;
+            localStorage.setItem(`bal_${userId}`, balance);
+        }
+
+        function playGame() {
+            const bet = parseInt(document.getElementById('bet-amount').value);
+            if (bet > balance || bet <= 0) return alert("Недостаточно средств!");
+
+            tg.HapticFeedback.impactOccurred('medium');
+            const cube = document.getElementById('cube');
+            cube.classList.add('spinning');
+
+            setTimeout(() => {
+                cube.classList.remove('spinning');
+                const res = Math.floor(Math.random() * 6) + 1;
+                const angles = { 1:'rotateY(0deg)', 2:'rotateY(-90deg)', 3:'rotateY(-180deg)', 4:'rotateY(90deg)', 5:'rotateX(-90deg)', 6:'rotateX(90deg)' };
+                cube.style.transform = `translateZ(-40px) ${angles[res]}`;
+
+                setTimeout(() => {
+                    const pick = document.getElementById('bet-outcome').value;
+                    const isEven = res % 2 === 0;
+                    if ((pick === 'even' && isEven) || (pick === 'odd' && !isEven)) {
+                        balance += bet; tg.HapticFeedback.notificationOccurred('success');
+                    } else {
+                        balance -= bet; tg.HapticFeedback.notificationOccurred('error');
+                    }
+                    updateUI();
+                }, 500);
+            }, 600);
+        }
+
+        function openCryptoBot() { tg.openTelegramLink('https://t.me/CryptoBot?start=pay'); }
+        updateUI();
+    </script>
 </body>
 </html>
